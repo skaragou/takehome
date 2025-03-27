@@ -15,13 +15,12 @@ async def startup(app: FastAPI):
     with open('./config.yaml', 'r') as f:
         config = yaml.safe_load(f)
 
-    # pipeline = transformers.pipeline(
-    #     "text-generation",
-    #     model=config['hugging_face_model'],
-    #     model_kwargs={"torch_dtype": torch.bfloat16},
-    #     device_map="auto",
-    # )
-    pipeline = None
+    pipeline = transformers.pipeline(
+        "text-generation",
+        model=config['hugging_face_model'],
+        model_kwargs={"torch_dtype": torch.bfloat16},
+        device_map="auto",
+    )
     session['pipeline'] = pipeline
     session['prompt'] = config['llm_prompt']
     yield
@@ -30,16 +29,15 @@ async def startup(app: FastAPI):
 app = FastAPI(lifespan=startup)
 
 def model_prediction(clinical_text: str) -> list[str]:
-    # messages = [
-    #     {'role': 'system', 'content': session['prompt']},
-    #     {'role': 'user', 'content': clinical_text}
-    # ]
-    # outputs = session['pipeline'](
-    #     messages,
-    #     max_new_tokens=256,
-    # )
-    # json_array = outputs[0]["generated_text"][-1]
-    json_array = '["test","hello"]'
+    messages = [
+        {'role': 'system', 'content': session['prompt']},
+        {'role': 'user', 'content': clinical_text}
+    ]
+    outputs = session['pipeline'](
+        messages,
+        max_new_tokens=256,
+    )
+    json_array = outputs[0]["generated_text"][-1]
     return json.loads(json_array)
 
 
