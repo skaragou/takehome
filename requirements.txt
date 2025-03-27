@@ -1,0 +1,6 @@
+fastapi
+fastapi[standard]
+transformers
+torch
+pyyaml
+uvicorn 
